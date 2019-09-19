@@ -1,4 +1,5 @@
 class Guides::Authentication::Api < GuideAction
+  ANCHOR_OPTIONAL_TOKEN = "perma-optional-token"
   guide_route "/authentication/api"
 
   def self.title
@@ -9,11 +10,10 @@ class Guides::Authentication::Api < GuideAction
     <<-MD
     ## Authenticating a request
 
-    By default all ApiActions will require an auth token because the
-    `ApiAction` in `src/actions/api_action.cr` includes the
-    `Api::Auth::RequireAuthToken`. That means that any actions inheriting
-    from it will require an auth token or the action will return a 401
-    unauthorized error.
+    By default all actions inherited from `ApiAction` will require an auth
+    token because the `ApiAction` in `src/actions/api_action.cr` includes the
+    `Api::Auth::RequireAuthToken`. This modules requires an auth token or the
+    action will return a 401 unauthorized error.
 
     We'll go over how to make an action accessible by unauthenticated requests
     later in the guide.
@@ -25,7 +25,7 @@ class Guides::Authentication::Api < GuideAction
 
     There are 2 ways to send this token.
 
-    * With an `Authorization: Bearer` header
+    * With an `Authorization` header
     * With an `auth_token` param in the query params or in the body.
 
     ### Examples using curl
@@ -52,7 +52,8 @@ class Guides::Authentication::Api < GuideAction
 
     > You could also include the token in JSON params: `{"auth_token":"fake-token"}`
 
-    ## Allowing unauthenticated requests
+    #{permalink(ANCHOR_OPTIONAL_TOKEN)}
+    ## Allowing requests without a token
 
     For actions that do not require an authentication token, include the
     `Api::Auth::SkipRequireAuthToken` mixin defined in
