@@ -103,7 +103,7 @@ class Guides::HttpAndRouting::ErrorHandling < GuideAction
     ```
 
     If there is no `render` for the exception, it will fallback to the
-    default one that is generated with every Lucky project: `render(e :
+    default one that is generated with every Lucky project: `render(error :
     Exception)`. You can customize that method in the same way by changing
     the message or status codes:
 
@@ -162,10 +162,32 @@ class Guides::HttpAndRouting::ErrorHandling < GuideAction
     ## Renderable errors
 
     > In general this should be a last resort or for libraries that want to
-    provide default behavior. Usually you should use `render` methods in
-    `Errors::Show` because it is far more customizable and much simpler to work with.
+    provide default behavior for errors. Usually you should use `render`
+    methods in `Errors::Show` because it is more customizable and
+    simpler to work with.
 
-    If you want to return a special http status code for an Exception class you can do this:
+    Lucky comes with a `Lucky::RenderableError` module that can be included in
+    errors so that Lucky knows what the status code and message should be.
+    Errors with `Lucky::RenderableError` must have a `renderable_status` and
+    `renderable_message` method defined.
+
+    By default, `Lucky::RenderableError`s are handled with the `render(error
+    : Lucky::RenderableError)` method included in all new Lucky projects
+
+    It looks something like this:
+
+    ```crystal
+    def render(error : Lucky::RenderableError)
+      if html?
+        error_html DEFAULT_MESSAGE, status: error.renderable_status
+      else
+        error_json error.renderable_message, status: error.renderable_status
+      end
+    end
+    ```
+
+    If you want to make it so your error is rendered with this method
+    you can do this:
 
     ```crystal
     # Define your custom exception
